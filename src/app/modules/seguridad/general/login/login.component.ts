@@ -1,6 +1,12 @@
+import { isDelegatedFactoryMetadata } from '@angular/compiler/src/render3/r3_factory';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ConfigurationData } from 'src/app/config/ConfigurationData';
+import { UserCredentialsModel } from 'src/app/models/user-credentials.model';
+import { SecurityService } from 'src/app/services/security.service';
+/*var CryptoJS = require("crypto-js")*/
+import {MD5} from 'crypto-js'
+declare const showGeneralMessage:any;
 
 @Component({
   selector: 'app-login',
@@ -12,7 +18,8 @@ export class LoginComponent implements OnInit {
   dataForm: FormGroup = new FormGroup({});
 
   constructor(
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private securityService: SecurityService
   ) { }
 
   ngOnInit(): void {
@@ -28,10 +35,20 @@ export class LoginComponent implements OnInit {
 
   Login(){
     if(this.dataForm.invalid){
-      alert("Datos Invalidos")
+      showGeneralMessage(ConfigurationData.INVALID_FORM_MESSAGE)
     }else{
-      alert("Datos validados")
+      let credentials = new UserCredentialsModel();
+      credentials.username = this.GetDF["username"].value;
+      credentials.password = MD5(this.GetDF["password"].value).toString();
+      this.securityService.Login(credentials).subscribe((data: any)=>{
+        console.log(data);
+      },
+      (error: any) => {
+
+      });
     }
   }
-
+  get GetDF(){
+    return this.dataForm.controls;
+  }
 }
