@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ConfigurationData } from 'src/app/config/ConfigurationData';
 import { UserCredentialsModel } from 'src/app/models/user-credentials.model';
-import { SecurityService } from 'src/app/services/security.service';
+import { SecurityService } from 'src/app/services/shared/security.service';
 /*var CryptoJS = require("crypto-js")*/
 import {MD5} from 'crypto-js'
 declare const showGeneralMessage:any;
@@ -40,12 +40,16 @@ export class LoginComponent implements OnInit {
       let credentials = new UserCredentialsModel();
       credentials.username = this.GetDF["username"].value;
       credentials.password = MD5(this.GetDF["password"].value).toString();
-      this.securityService.Login(credentials).subscribe((data: any)=>{
-        console.log(data);
+      this.securityService.Login(credentials).subscribe({
+        next: (data: any)=>{
+          console.log(data);
       },
-      (error: any) => {
+      error: (error: any) => {
 
-      });
+      },
+      complete: () =>{
+
+      }});
     }
   }
   get GetDF(){
